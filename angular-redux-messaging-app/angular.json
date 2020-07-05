@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "angular-redux-messaging-app"
+    }
+  },
+  "defaultProject": "angular-redux-messaging-app",
+  "cli": {
+    "analytics": false
+  }
 }
