@@ -1,8 +1,13 @@
-export interface Action {
-    type: string;   // e.g. INCREMENT, ADD_USER
-    payload?: any; // payload may be optional
-}
+/**
+ * Użyliśmy Action z core Reduxa! Nie używamy już właśnych customowych akcji.
+ * Zauważ, że lista wiadomości to także może być lista TODO
+ */
+import {
+    Action,
+    ActionCreator
+} from 'redux';
 
+// Actions
 // AddMessageAction - adds message to messages
 export interface AddMessageAction extends Action {
     message: string;
@@ -14,19 +19,17 @@ export interface DeleteMessageAction extends Action {
     index: number;
 }
 
-export class MessageActions {
+export const addMessageAction: ActionCreator<Action> = (messagePar: string) => {
+    return {
+        type: 'ADD_MESSAGE',
+        message: messagePar,
+    };
+};
 
-    static addMessage(messagePar: string): AddMessageAction {
-        return {
-            type: 'ADD_MESSAGE',
-            message: messagePar,
-        };
-    }
+export const deleteMessageAction: ActionCreator<Action> = (indexPar: number) => {
+    return {
+        type: 'DELETE_MESSAGE',
+        index: indexPar,
+    };
+};
 
-    static deleteMessage(indexPar: number): DeleteMessageAction {
-        return {
-            type: 'DELETE_MESSAGE',
-            index: indexPar,
-        };
-    }
-}

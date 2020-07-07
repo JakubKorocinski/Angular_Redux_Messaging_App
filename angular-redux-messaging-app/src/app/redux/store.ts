@@ -1,43 +1,46 @@
-import { Reducer } from './messages.reducer';
-import { Action } from './actions';
+import { AppState, initialState } from './state';
+import {
+    Store,
+    StoreEnhancer,
+    createStore,
+    compose,
+    Action
+} from 'redux';
 
-export type ListenerCallback = () => void;
+/**
+ * The code above will check for window.devToolsExtension, which is defined by
+ * Redux Devtools, and if it exists, we will use it. If it doesn’t exist, we’re just returning
+ * an identity function (f => f) that will return whatever is passed to it.
+ */
 
-export type UnsubscribeCallback = () => void;
 
-export class Store<T> {
-    // tslint:disable-next-line:variable-name
-    private _state: T;
-    // tslint:disable-next-line:variable-name
-    private _listeners: ListenerCallback[] = [];
+const devtools: StoreEnhancer<AppState> =
+// tslint:disable-next-line:no-string-literal
+window['devToolsExtension'] ?
+// tslint:disable-next-line:no-string-literal
+window['devToolsExtension']() : f => f;
 
-    constructor(
-        private reducer: Reducer<T>,
-        initialState: T
-    ) {
-        this._state = initialState;
-    }
 
-    getState() {
-        return this._state;
-    }
 
-    /*
-        Adding the new listener is easy: we push it on to the _listeners array.
+import {
+    messagesReducer as reducer
+  } from './messages.reducer';
+import { InjectionToken } from '@angular/core';
 
-        The return value is a function which will update the list of _listeners to be
-        the list of _listeners without the listener we just added. That is, it returns the
-        UnsubscribeCallback that we can use to remove this listener from the list.
-    */
-    subscribe(listener: ListenerCallback): UnsubscribeCallback {
-        this._listeners.push(listener);
-        return () => {
-            this._listeners = this._listeners.filter(e => e !== listener);
-        };
-    }
-
-    dispatch(action: Action): void {
-        this._state = this.reducer(this._state, action);
-        this._listeners.forEach((listener: ListenerCallback) => listener()); // Dla kazdej metody w streamie - wykonaj ta metode
-    }
+export function createAppStore(): Store<AppState> {
+    return createStore(
+      reducer,
+      initialState,
+      compose(devtools)
+      /**
+       * Now whenever we dispatch an action and change our state, we can inspect it in our browser!
+       */
+    );
 }
+
+// For DI
+export const AppStore = new InjectionToken('App.store');
+export const appStoreProviders = [
+    { provide: AppStore, useFactory: createAppStore }
+];
+
